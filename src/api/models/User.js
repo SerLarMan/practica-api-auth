@@ -7,13 +7,14 @@ const userSchema = new mongoose.Schema(
     email: { type: String, trim: true, required: true },
     password: { type: String, trim: true, required: true },
     role: { type: String, trim: true },
+    orders: [{ type: mongoose.Types.ObjectId, ref: "Order" }],
   },
   {
     timestamps: true,
   }
 );
 
-userSchema.pre("save", function(next) {
+userSchema.pre("save", function (next) {
   this.password = bcrypt.hashSync(this.password, 10);
   next();
 });

@@ -15,7 +15,13 @@ const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate({
+      path: "orders",
+      populate: {
+        path: "products",
+        model: "Product",
+      },
+    });
     return res.status(200).json(user);
   } catch (error) {
     next(error);
@@ -32,7 +38,7 @@ const registerUser = async (req, res, next) => {
     }
 
     user.role = "user";
-    const userDB = user.save();
+    const userDB = await user.save();
     return res.status(201).json(userDB);
   } catch (error) {
     next(error);
@@ -58,4 +64,60 @@ const loginUser = async (req, res, next) => {
   }
 };
 
-module.exports = { getUsers, getUserById, registerUser, loginUser };
+const updateUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (req.user.role == "user") {
+      // Si el usuario no tiene permisos para modificar a otros saltará error
+      if (req.user._id != id) {
+        return res.status(401).json("Unauthorized");
+      // Si el usuario no tiene permisos e intenta modificar su propio rol
+      } else if (req.body.role) {
+        return res
+          .status(401)
+          .json("Normal users cannot modify their role. Only an admin can.");
+      }
+    }
+
+    const newUser = new User(req.body);
+    newUser._id = id;
+
+    // Se vuelve a encriptar la contraseña en caso que el usuario quiera modificarla
+    if (newUser.password) {
+      newUser.password = bcrypt.hashSync(newUser.password, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, newUser, {
+      new: true,
+    });
+    return res.status(200).json(updatedUser);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Si el usuario no tiene permisos e intenta borrar a otro usuario saltará error
+    if (req.user.role == "user" && req.user._id != id) {
+      return res.status(401).json("Unauthorized");
+    }
+
+    await User.findByIdAndDelete(id);
+    return res.status(200).json("User deleted");
+  } catch (error) {
+    return next(error);
+  }
+};
+
+module.exports = {
+  getUsers,
+  getUserById,
+  registerUser,
+  loginUser,
+  updateUser,
+  deleteUser,
+};
