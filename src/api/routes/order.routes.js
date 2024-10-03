@@ -6,12 +6,14 @@ const {
   deleteOrder,
 } = require("../controllers/order");
 
+const { isAuth } = require("../../middlewares/auth.middleware");
+
 const orderRouter = require("express").Router();
 
 orderRouter.get("/", getOrder);
 orderRouter.get("/:id", getOrderById);
-orderRouter.post("/", addOrder);
-orderRouter.put("/:id", updateOrder);
-orderRouter.delete("/:id", deleteOrder);
+orderRouter.post("/", isAuth, addOrder);
+orderRouter.put("/:id", isAuth, updateOrder);
+orderRouter.delete("/:id", isAuth, deleteOrder);
 
 module.exports = orderRouter;

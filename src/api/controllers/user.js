@@ -72,7 +72,7 @@ const updateUser = async (req, res, next) => {
       // Si el usuario no tiene permisos para modificar a otros saltará error
       if (req.user._id != id) {
         return res.status(401).json("Unauthorized");
-      // Si el usuario no tiene permisos e intenta modificar su propio rol
+        // Si el usuario no tiene permisos e intenta modificar su propio rol
       } else if (req.body.role) {
         return res
           .status(401)
@@ -80,8 +80,16 @@ const updateUser = async (req, res, next) => {
       }
     }
 
+    const user = await User.findById(id).populate("orders");
     const newUser = new User(req.body);
     newUser._id = id;
+
+    // Se comprueba que no se repitan las ordenes
+    user.orders.forEach((order) => {
+      if (!newUser.orders.includes(order._id)) {
+        newUser.orders.push(order);
+      }
+    });
 
     // Se vuelve a encriptar la contraseña en caso que el usuario quiera modificarla
     if (newUser.password) {

@@ -7,7 +7,7 @@ Se conecta a una base de datos MongoDB e interactua con tres modelos:
 - Orders
 - Products
 
-El modelo de Users tiene una colección de Orders con la fecha en la que se hizo la orden y Orders a su vez tiuene una colección de Products. De esta manera el usuario hace ordenes que contienen productos para realizar una compra.
+El modelo de Users tiene una colección de Orders con la fecha en la que se hizo la orden y Orders a su vez tiene una colección de Products. De esta manera el usuario hace ordenes que contienen productos para realizar una compra.
 
 ## Instalación
 

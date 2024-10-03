@@ -23,6 +23,10 @@ const addProduct = async (req, res, next) => {
   try {
     const product = new Product(req.body);
 
+    if (req.user.role == "user") {
+      return res.status(401).json("Only admins can add products");
+    }
+
     const productDB = await product.save();
     return res.status(201).json(productDB);
   } catch (error) {
@@ -33,6 +37,10 @@ const addProduct = async (req, res, next) => {
 const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    if (req.user.role == "user") {
+      return res.status(401).json("Only admins can update products");
+    }
 
     const newProduct = new Product(req.body);
     newProduct._id = id;
@@ -48,6 +56,11 @@ const updateProduct = async (req, res, next) => {
 const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    if (req.user.role == "user") {
+      return res.status(401).json("Only admins can delete products");
+    }
+
     await Product.findByIdAndDelete(id);
     return res.status(200).json("Product deleted");
   } catch (error) {
