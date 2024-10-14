@@ -16,4 +16,12 @@ const isAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { isAuth };
+const isAdmin = async (req, res, next) => {
+  if (req.user.rol == "user") {
+    return res.status(401).json("User must be an admin");
+  } else {
+    next();
+  }
+};
+
+module.exports = { isAuth, isAdmin };

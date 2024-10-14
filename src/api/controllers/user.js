@@ -37,7 +37,7 @@ const registerUser = async (req, res, next) => {
       return res.status(400).json("Ya existe un usuario con ese email");
     }
 
-    user.role = "user";
+    user.rol = "user";
     const userDB = await user.save();
     return res.status(201).json(userDB);
   } catch (error) {
@@ -68,15 +68,15 @@ const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    if (req.user.role == "user") {
+    if (req.user.rol == "user") {
       // Si el usuario no tiene permisos para modificar a otros saltará error
       if (req.user._id != id) {
         return res.status(401).json("Unauthorized");
         // Si el usuario no tiene permisos e intenta modificar su propio rol
-      } else if (req.body.role) {
+      } else if (req.body.rol) {
         return res
           .status(401)
-          .json("Normal users cannot modify their role. Only an admin can.");
+          .json("Normal users cannot modify their rol. Only an admin can.");
       }
     }
 
@@ -110,7 +110,7 @@ const deleteUser = async (req, res, next) => {
     const { id } = req.params;
 
     // Si el usuario no tiene permisos e intenta borrar a otro usuario saltará error
-    if (req.user.role == "user" && req.user._id != id) {
+    if (req.user.rol == "user" && req.user._id != id) {
       return res.status(401).json("Unauthorized");
     }
 

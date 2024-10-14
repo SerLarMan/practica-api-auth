@@ -62,10 +62,6 @@ const deleteOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    if (req.user.role == "user") {
-      return res.status(401).json("Only admins can delete orders");
-    }
-
     await Order.findByIdAndDelete(id);
     return res.status(200).json("Order deleted");
   } catch (error) {
